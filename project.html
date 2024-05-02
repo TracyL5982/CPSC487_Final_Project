@@ -28,7 +28,8 @@
     import { get_default_lil_gui, ThreeEngine, refresh_displays } from "../js/utils/utils_three.js";
     import { mul_matrix_matrix } from "../js/utils/utils_math.js";
     import { STLLoader } from 'https://unpkg.com/three@0.160.0/examples/jsm/loaders/STLLoader.js';
-    
+    import { genLeafMesh } from "../js/utils/leaf.js"
+
     // Setup of ThreeEngine
     let engine = ThreeEngine.new_default_3d();
 
@@ -83,25 +84,25 @@
     // Setup of STL Loader
     const stlLoader = new STLLoader();
     stlLoader.load('../js/assets/foliage.stl', function (geometry) {
-        console.log('STL file loaded successfully');
+        //console.log('STL file loaded successfully');
         if (!geometry) {
-            console.error('No geometry in STL file');
+            //console.error('No geometry in STL file');
             return;
         }
 
 
         foliageMesh = new THREE.Mesh(geometry, greenShaderMaterial);
-        console.log('Mesh created:', foliageMesh);
+        //console.log('Mesh created:', foliageMesh);
 
         foliageMesh.rotation.set(-Math.PI / 2, 0, 0);
         foliageMesh.scale.set(0.5, 0.5, 0.5);
 
-        engine.scene.add(foliageMesh);
-        console.log('foliageMesh added to scene');
+        //engine.scene.add(foliageMesh);
+        //console.log('foliageMesh added to scene');
     }, function (xhr) {
-        console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+        //console.log((xhr.loaded / xhr.total * 100) + '% loaded');
     }, function (error) {
-        console.error('An error happened during STL loading', error);
+        //console.error('An error happened during STL loading', error);
     });
 
     // GUI and other setup
@@ -149,7 +150,7 @@
     var treeGeometry = THREE.TreeGeometry.build(tree);
     var textureLoader = new THREE.TextureLoader();
 
-    textureLoader.load('../js/assets/bark.png', function(texture) {
+    textureLoader.load('../js/assets/bark_1.png', function(texture) {
         var treeMaterial = new THREE.MeshPhongMaterial({
             map: texture
         });
@@ -157,6 +158,8 @@
         treeMaterial.shininess = 100;
         engine.scene.add(treeMesh);
     });
+
+    genLeafMesh(tree, 'rect', 2, 1, engine);
 
     engine.animation_loop((delta) => {
         
