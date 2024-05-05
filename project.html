@@ -30,127 +30,136 @@
     import { STLLoader } from 'https://unpkg.com/three@0.160.0/examples/jsm/loaders/STLLoader.js';
     import { genLeafMesh } from "../js/utils/leaf.js"
 
+    const trees = [
+            {
+                name: 'peach',
+                parameters: {
+                    generations: 6,
+                    length: 13,
+                    uvLength: 78,
+                    radius: 1.5,
+                    radiusSegments: 10,
+                    heightSegments: 5,
+                    branchTheta: 0.25 * Math.PI
+                },
+                leafShape: 'rect',
+                leafType: 'peach',
+                leafScale: 2,
+                leafScaleX: 1
+            },
+            {
+                name: 'poinciana',
+                parameters: {
+                    generations: 5,
+                    length: 6,
+                    uvLength: 30,
+                    radius: 0.5,
+                    radiusSegments: 10,
+                    heightSegments: 8,
+                    branchTheta: 0.2 * Math.PI
+                },
+                leafShape: 'rect',
+                leafType: 'poinciana',
+                leafScale: 3,
+                leafScaleX: 1
+            },
+            {
+                name: 'pine',
+                parameters: {
+                    generations: 4,
+                    length: 5.0,
+                    uvLength: 20.0,
+                    radius: 1.0,
+                    radiusSegments: 10,
+                    heightSegments: 15,
+                    branchTheta: 0.3 * Math.PI
+                },
+                leafShape: 'rect',
+                leafType: 'pine',
+                leafScale: 3,
+                leafScaleX: 3
+            },
+            {
+                name: 'aspen',
+                parameters: {
+                    generations: 5,
+                    length: 10.0,
+                    uvLength: 24.0,
+                    radius: 0.5,
+                    radiusSegments: 10,
+                    heightSegments: 5,
+                    branchTheta: 0.1 * Math.PI
+                },
+                leafShape: 'rect',
+                leafType: 'aspen',
+                leafScale: 4,
+                leafScaleX: 1
+            },
+            {
+                name: 'maple',
+                parameters: {
+                    generations: 5,
+                    length: 7.0,
+                    uvLength: 35.0,
+                    radius: 0.5,
+                    radiusSegments: 10,
+                    heightSegments: 5,
+                    branchTheta: 0.2 * Math.PI
+                },
+                leafShape: 'rect',
+                leafType: 'maple',
+                leafScale: 2,
+                leafScaleX: 1
+            }
+        ];
+
+    const selectedTree = trees[Math.floor(Math.random() * trees.length)];
+
     // Setup of ThreeEngine
-    let engine = ThreeEngine.new_default_3d();
-
-    let foliageMesh;
-
-    const greenShaderMaterial = new THREE.ShaderMaterial({
-        vertexShader: `
-            varying float vHeight;
-            varying vec3 vNormal;
-
-            void main() {
-                vHeight = position.y; // Pass the vertical position to the fragment shader
-                vNormal = normalize(normalMatrix * normal); // Calculate the normal for lighting
-                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-            }
-        `,
-        fragmentShader: `
-            varying float vHeight;
-            varying vec3 vNormal;
-
-            void main() {
-                vec3 color1 = vec3(0.258, 0.439, 0.384); // Corresponds to #427062
-                vec3 color2 = vec3(0.204, 0.349, 0.306); // Corresponds to #33594E
-                vec3 color3 = vec3(0.137, 0.371, 0.286); // Corresponds to #234549
-                vec3 color4 = vec3(0.118, 0.312, 0.247); // Corresponds to #1E363F
-
-                float mixFactor = (vHeight + 1.0) / 2.0; // Normalize vHeight to 0.0 - 1.0 range
-                vec3 mixColor;
-                if (mixFactor < 0.33) {
-                    mixColor = mix(color1, color2, mixFactor / 0.33);
-                } else if (mixFactor < 0.66) {
-                    mixColor = mix(color2, color3, (mixFactor - 0.33) / 0.33);
-                } else {
-                    mixColor = mix(color3, color4, (mixFactor - 0.66) / 0.34);
-                }
-
-                // Simple diffuse lighting
-                vec3 lightDirection = normalize(vec3(0.5, 1.0, 0.75)); // Direction of the light
-                float diff = max(dot(vNormal, lightDirection), 0.0);
-                vec3 finalColor = mixColor * diff; // Modulate color by the light angle
-
-                gl_FragColor = vec4(finalColor, 1.0); // Output the final color with full opacity
-            }
-        `,
-        uniforms: {
-            topColor: { value: new THREE.Color("#427062") },
-            bottomColor: { value: new THREE.Color("#1E363F") }
-        }
-    });
-    
-    
-    // Setup of STL Loader
-    const stlLoader = new STLLoader();
-    stlLoader.load('../js/assets/foliage.stl', function (geometry) {
-        //console.log('STL file loaded successfully');
-        if (!geometry) {
-            //console.error('No geometry in STL file');
-            return;
-        }
-
-
-        foliageMesh = new THREE.Mesh(geometry, greenShaderMaterial);
-        //console.log('Mesh created:', foliageMesh);
-
-        foliageMesh.rotation.set(-Math.PI / 2, 0, 0);
-        foliageMesh.scale.set(0.5, 0.5, 0.5);
-
-        //engine.scene.add(foliageMesh);
-        //console.log('foliageMesh added to scene');
-    }, function (xhr) {
-        //console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-    }, function (error) {
-        //console.error('An error happened during STL loading', error);
-    });
+    let engine = ThreeEngine.new_default_3d(30, 10, 30, false, selectedTree.name);
 
     // GUI and other setup
-    let params = {
-        generations: 5,
-        length: 4.0,
-        uvLength: 20.0,
-        radius: 0.2,
-        radiusSegments: 8,
-        heightSegments: 5
-    };
+   //let params = {
+   //     generations: 5, //5 and 6 tends to yield the best results
+   //     length: 6.0, //for tree height [3, 15]
+   //     uvLength: 30.0, //recommend = generations * length
+   //     radius: 0.5, //tree radius, [length/25, length/6]
+   //     radiusSegments: 10, //recommend >= 8
+   //     heightSegments: 8, // >=3, the larger heightSegments is, the curvier/smooth the tree branch will be
+   //     branchTheta: 0.2 * Math.PI,
+   // };
 
-    let operations = {
-        reset: function() {
-            params.generations = 4;
-            params.length = 4.0;
-            params.uvLength = 16.0;
-            params.radius = 0.2;
-            params.radiusSegments = 8;
-            params.heightSegments = 8;
-            refresh_displays(gui);
-        }
-    };
+    //let operations = {
+    //    reset: function() {
+   //         params.generations = 4;
+   //         params.length = 4.0;
+   //         params.uvLength = 16.0;
+   //         params.radius = 0.2;
+   //         params.radiusSegments = 8;
+   //         params.heightSegments = 8;
+   //         refresh_displays(gui);
+   //     }
+   // };
 
-    let gui = get_default_lil_gui();
-    let folder = gui.addFolder("Parameters");
-    folder.add(params, 'generations', 1, 10).name('Generations');
-    folder.add(params, 'length', 1, 10).name('Length');
-    folder.add(params, 'uvLength', 5, 30).name('UVLength');
-    folder.add(params, 'radius', 0, 2).name('Radius');
-    folder.add(params, 'radiusSegments', 0, 20).name('RadiusSegments');
-    folder.add(params, 'heightSegments', 0, 20).name('HeightSegments');
-    gui.add(operations, 'reset').name('Reset parameters');
+    //let gui = get_default_lil_gui();
+    //let folder = gui.addFolder("Parameters");
+    //folder.add(params, 'generations', 1, 10).name('Generations');
+    //folder.add(params, 'length', 1, 10).name('Length');
+    //folder.add(params, 'uvLength', 5, 30).name('UVLength');
+    //folder.add(params, 'radius', 0, 2).name('Radius');
+    //folder.add(params, 'radiusSegments', 0, 20).name('RadiusSegments');
+    //folder.add(params, 'heightSegments', 0, 20).name('HeightSegments');
+    //folder.add(params, 'branchTheta', 0, 20).name('branchTheta');
+    //gui.add(operations, 'reset').name('Reset parameters');
 
-    // Existing three.js extensions and use
-    var tree = new THREE.Tree({
-        generations: params.generations,
-        length: params.length,
-        uvLength: params.uvLength,
-        radius: params.radius,
-        radiusSegments: params.radiusSegments,
-        heightSegments: params.heightSegments
-    });
+    var tree = new THREE.Tree(selectedTree.parameters);
 
     var treeGeometry = THREE.TreeGeometry.build(tree);
     var textureLoader = new THREE.TextureLoader();
 
-    textureLoader.load('../js/assets/bark_1.png', function(texture) {
+    const barkPath = `../js/assets/bark_${selectedTree.name}.png`;
+
+    textureLoader.load(barkPath, function(texture) {
         var treeMaterial = new THREE.MeshPhongMaterial({
             map: texture
         });
@@ -159,7 +168,7 @@
         engine.scene.add(treeMesh);
     });
 
-    genLeafMesh(tree, 'rect', 2, 1, engine);
+    genLeafMesh(tree, selectedTree.leafShape, selectedTree.leafType, selectedTree.leafScale, selectedTree.leafScaleX, engine);
 
     engine.animation_loop((delta) => {
         

@@ -6,9 +6,8 @@
  * */
 THREE.TreeSpawner = function(params) {
     params = params || {};
-    this.theta = params.theta || Math.PI * 0.5; 
+    this.theta = params.theta || Math.PI * 0.25; 
     this.attenuation = params.attenuation || 0.75; 
-
     this.rootRange = params.rootRange || new THREE.Vector2(0.75, 1.0);
 };
 
@@ -18,8 +17,11 @@ THREE.TreeSpawner.prototype = {
         var atten = this.attenuation;
 
         var htheta = theta * 0.5;
-        var x = Math.random() * theta - htheta;
-        var z = Math.random() * theta - htheta;
+        // var x = Math.random() * theta - htheta;
+        // var z = Math.random() * theta - htheta;
+
+        var x = randomAngle(-theta, theta);
+        var z = randomAngle(-theta, theta);
         var len = branch.length * atten;
 
         var rot = new THREE.Matrix4();
@@ -91,6 +93,11 @@ THREE.TreeBranch = function(params) {
     this.children = [];
 }
 
+function randomAngle(min, max) {
+    return Math.random() * (max - min) + min;
+}
+
+
 THREE.TreeBranch.prototype = {
 
     buildTreeSegments : function(radius, radiusSegments, direction, heightSegments) {
@@ -100,6 +107,20 @@ THREE.TreeBranch.prototype = {
         var htheta = theta * 0.5;
         var x = Math.random() * theta - htheta;
         var z = Math.random() * theta - htheta;
+
+        // 0-0.25 PI - 0
+
+        // var theta = Math.PI * 0.5;  // This is Pi/2, but you can adjust or remove this if it's globally defined
+        // var htheta = theta * 0.5;   // Half theta, Pi/4
+
+        // // make branches straighter or curvier
+
+        // var x = randomAngle(-Math.PI * 0.125, Math.PI * 0.125);
+        // var z = randomAngle(-Math.PI * 0.125, Math.PI * 0.125);
+
+        // // var x = randomAngle(-Math.PI * 0.01, Math.PI * 0.01);
+        // // var z = randomAngle(-Math.PI * 0.01, Math.PI * 0.01);
+
         var rot = new THREE.Matrix4();
         var euler = new THREE.Euler(x, 0, z);
         rot.makeRotationFromEuler(euler);
@@ -245,12 +266,12 @@ THREE.Tree = function(params, spawner) {
     var length = params.length || 3.0;
     var uvLength = params.uvLength || 10.0;
     var generations = (params.generations !== undefined) ? params.generations : 5;
-
     var radius = params.radius || 0.1;
     this.radiusSegments = params.radiusSegments || 8;
     this.heightSegments = params.heightSegments || 8;
 
     this.generations = generations;
+    this.spawner = spawner || new THREE.TreeSpawner({theta: params.branchTheta});
     this.root = new THREE.TreeBranch({ 
         from : from,
         rotation : rotation,
@@ -262,8 +283,6 @@ THREE.Tree = function(params, spawner) {
         radiusSegments : this.radiusSegments,
         heightSegments : this.heightSegments
     });
-
-    this.spawner = spawner || new THREE.TreeSpawner();
     this.root.branch(this.spawner, this.generations);
 }
 

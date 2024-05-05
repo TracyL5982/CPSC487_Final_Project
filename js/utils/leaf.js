@@ -1,20 +1,26 @@
-export function genLeafMesh(tree, leafShape, leafScale = 1, leafScaleX = 1, engine) {
+export function genLeafMesh(tree, leafShape, leafType, leafScale = 1, leafScaleX = 1, engine) {
     const leaves = [];
     const loader = new THREE.TextureLoader();
 
+    const texturePath = `../js/assets/${leafType}_leaf.png`; 
     console.log("Starting texture loading...");
 
     // Load the leaf texture
     loader.load(
-        '../js/assets/leaf_4.png',  // Ensure this is the correct path
+        texturePath,  // Ensure this is the correct path
         function(texture) {
             console.log("Texture loaded successfully:", texture);
             const leafMaterial = new THREE.MeshBasicMaterial({
                 map: texture,
                 side: THREE.DoubleSide,       // Render both sides of the leaf
                 transparent: true,            // Enable transparency
-                alphaTest: 0.5,               // Configure alpha testing (adjust this value as needed)
+                alphaTest: 0.1,               // Configure alpha testing (adjust this value as needed)
                 opacity: 0.99                 // Set opacity slightly less than 1 for better blending
+            });
+
+            const debugMaterial = new THREE.MeshBasicMaterial({
+                color: 0xffffff, // Green color
+                side: THREE.DoubleSide, // Render both sides of the leaf
             });
 
             const leafGeometry = new THREE.BufferGeometry();
@@ -53,7 +59,7 @@ export function genLeafMesh(tree, leafShape, leafScale = 1, leafScaleX = 1, engi
 
             // Position leaves at branchlets
             tree.branchlets().forEach(branchlet => {
-                for (let i = 0; i < 3; i++) {
+                for (let i = 0; i < 5; i++) {
                     const leafMesh = new THREE.Mesh(leafGeometry, leafMaterial);
                     const positionOffset = new THREE.Vector3(
                         (Math.random() - 0.5) * 0.1,
@@ -64,6 +70,7 @@ export function genLeafMesh(tree, leafShape, leafScale = 1, leafScaleX = 1, engi
                     leafMesh.position.copy(branchlet.to.clone().add(positionOffset));
                     leafMesh.lookAt(branchlet.from.position);
                     leafMesh.rotateY(Math.random() * Math.PI * 2);
+                    leafMesh.rotateZ(Math.random() * Math.PI * 2);
 
                     engine.scene.add(leafMesh);
                     leaves.push(leafMesh);

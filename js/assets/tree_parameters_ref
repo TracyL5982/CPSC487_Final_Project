@@ -1,0 +1,60 @@
+Peach Tree:
+    Generations = 6
+    Length = 13
+    UVLength = 78
+    Radius = 1.5
+    RadiusSegments = 10
+    HeightSegments = 5
+    branchTheta = 0.25 * Math.PI
+
+    peach_leaf.png
+    genLeafMesh(tree, 'rect', 2, 1, engine);
+
+Poinciana Tree:
+    Generations = 5
+    Length = 6
+    UVLength = 30
+    Radius = 0.5
+    RadiusSegments = 10
+    HeightSegments = 8
+    branchTheta = 0.2 * Math.PI
+
+    poinciana_leaf.png
+    genLeafMesh(tree, 'rect', 'poinciana', 3, 1, engine);
+
+Pine Tree:
+    generations: 4
+    length: 5.0
+    uvLength: 20.0
+    radius: 1.0, 
+    radiusSegments: 10
+    heightSegments: 15
+    branchTheta: 0.3 
+
+    pine_leaf.png
+    genLeafMesh(tree, 'rect', 'pine', 3, 3, engine);
+
+
+Aspen tree:
+    generations: 5, 
+    length: 10.0, 
+    uvLength: 24.0,
+    radius: 0.5, 
+    radiusSegments: 10, 
+    heightSegments: 5, 
+    branchTheta: 0.1 * Math.PI,
+
+    aspen_leaf.png
+    genLeafMesh(tree, 'rect', 'aspen', 4, 1, engine);
+
+Maple tree:
+    generations: 5, 
+    length: 7.0, 
+    uvLength: 35.0,
+    radius: 0.5, 
+    radiusSegments: 10, 
+    heightSegments: 5, 
+    branchTheta: 0.2 * Math.PI,
+
+    maple_leaf.png
+    genLeafMesh(tree, 'rect', 'maple', 2, 1, engine);

@@ -46,7 +46,7 @@ export class ThreeEngine {
         threejs_responsive_canvas(this.camera, this.renderer);
     }
 
-    static #new_default_generic(orthographic_camera=false) {
+    static #new_default_generic(orthographic_camera=false, background = 'default_bg') {
         const scene = new THREE.Scene();
         let camera;
         if(orthographic_camera) {
@@ -107,7 +107,12 @@ export class ThreeEngine {
         // pointLight2.shadow.mapSize.height = 2048;
         // scene.add(pointLight3);
 
-        scene.background = new THREE.Color(0xF3F3FE);
+        //scene.background = new THREE.Color(0xF3F3FE);
+
+        const loader = new THREE.TextureLoader();
+        loader.load(`../js/assets/${background}_bg.png`, function(texture) {
+            scene.background = texture;
+        })
 
         // const floorGeometry = new THREE.PlaneGeometry(20, 20); // 10x10 size
         // const floorMaterial = new THREE.MeshStandardMaterial({ color: 0x808080 });
@@ -149,8 +154,8 @@ export class ThreeEngine {
         return engine;
     }
 
-    static new_default_3d(camera_x=3, camera_y=2, camera_z=1, orthographic_camera=false) {
-        let engine = ThreeEngine.#new_default_generic(orthographic_camera);
+    static new_default_3d(camera_x=3, camera_y=2, camera_z=1, orthographic_camera=false, background = 'default_bg') {
+        let engine = ThreeEngine.#new_default_generic(orthographic_camera, background);
         z_up_set_object_position(engine.camera, camera_x, camera_y, camera_z);
         engine.camera.lookAt(0,0,0);
         engine.is2D = false;
