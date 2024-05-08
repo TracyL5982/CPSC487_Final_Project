@@ -5,7 +5,7 @@ THREE.TreeGeometry = {
         var indices = [];
         var uvs = [];
 
-        this.buildBranches(tree.root, vertices, indices, uvs, 0, null); // Start with no parent index
+        this.buildBranches(tree.root, vertices, indices, uvs, 0, null); 
         geometry.setIndex(indices);
         geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
         geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
@@ -13,10 +13,14 @@ THREE.TreeGeometry = {
         return geometry;
     },
 
+       /*
+     * Build branches of a tree recursively.
+     * */
+
     buildBranches: function(branch, vertices, indices, uvs, vertexOffset, parentLastRowIndex) {
         var radiusSegments = branch.radiusSegments;
         var heightSegments = branch.segments.length - 1;
-        var currentVertexOffset = vertices.length / 3; // Update current offset for vertices
+        var currentVertexOffset = vertices.length / 3; 
 
         for (var y = 0; y <= heightSegments; y++) {
             var segment = branch.segments[y];
@@ -41,7 +45,6 @@ THREE.TreeGeometry = {
         }
 
         if (branch.from === null) {
-            // Handle root branch bottom cap
             var sumX = 0, sumY = 0, sumZ = 0;
             for (var i = 0; i <= radiusSegments; i++) {
                 sumX += vertices[(currentVertexOffset + i) * 3];
@@ -52,8 +55,8 @@ THREE.TreeGeometry = {
             var centerY = sumY / (radiusSegments + 1);
             var centerZ = sumZ / (radiusSegments + 1);
             
-            vertices.push(centerX, centerY, centerZ); // Add central vertex
-            uvs.push(0.5, 0.5); // Center UV
+            vertices.push(centerX, centerY, centerZ); 
+            uvs.push(0.5, 0.5); 
             var bottomIndex = vertices.length / 3 - 1;
             
             for (var x = 0; x < radiusSegments; x++) {
@@ -63,7 +66,6 @@ THREE.TreeGeometry = {
             }
         }
          else {
-            // Connect to parent branch
             var parentLastRowStartIndex = parentLastRowIndex;
             var currentRowStartIndex = currentVertexOffset;
 
@@ -82,10 +84,8 @@ THREE.TreeGeometry = {
         var newVertexOffset = vertices.length / 3;
         var newParentLastRowIndex;
         if (branch.from === null) {
-            // If it's root, the center vertex is added, exclude this vertex from the last row start index calculation
             newParentLastRowIndex = currentVertexOffset + (heightSegments-1) * (radiusSegments + 1) - 1;
         } else {
-            // No center vertex is added for non-root branches
             newParentLastRowIndex = currentVertexOffset + (heightSegments-1) * (radiusSegments + 1);
         }
         //var newParentLastRowIndex = currentVertexOffset + (heightSegments) * (radiusSegments + 1); // Last row of the current branch

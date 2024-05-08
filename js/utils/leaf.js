@@ -1,3 +1,4 @@
+// functions for generating leaves
 export function genLeafMesh(tree, leafShape, leafType, leafScale = 1, leafScaleX = 1, engine) {
     const leaves = [];
     const loader = new THREE.TextureLoader();
@@ -7,20 +8,20 @@ export function genLeafMesh(tree, leafShape, leafType, leafScale = 1, leafScaleX
 
     // Load the leaf texture
     loader.load(
-        texturePath,  // Ensure this is the correct path
+        texturePath,  
         function(texture) {
             console.log("Texture loaded successfully:", texture);
             const leafMaterial = new THREE.MeshBasicMaterial({
                 map: texture,
-                side: THREE.DoubleSide,       // Render both sides of the leaf
-                transparent: true,            // Enable transparency
-                alphaTest: 0.1,               // Configure alpha testing (adjust this value as needed)
-                opacity: 0.99                 // Set opacity slightly less than 1 for better blending
+                side: THREE.DoubleSide,      
+                transparent: true,            
+                alphaTest: 0.1,               
+                opacity: 0.99                
             });
 
             const debugMaterial = new THREE.MeshBasicMaterial({
-                color: 0xffffff, // Green color
-                side: THREE.DoubleSide, // Render both sides of the leaf
+                color: 0xffffff, 
+                side: THREE.DoubleSide, 
             });
 
             const leafGeometry = new THREE.BufferGeometry();
@@ -35,14 +36,14 @@ export function genLeafMesh(tree, leafShape, leafType, leafScale = 1, leafScaleX
                     leafScaleX, 0, leafScale,
                     -leafScaleX, 0, leafScale,
                     -leafScaleX, 0, 0,
-                    0, 0, leafScale / 2   // Additional vertex for shared edge
+                    0, 0, leafScale / 2   
                 );
                 uvs.push(
                     1, 0,
                     1, 1,
                     0, 1,
                     0, 0,
-                    0.5, 0.5              // UV for additional vertex
+                    0.5, 0.5              
                 );
                 indices.push(
                     0, 1, 4,

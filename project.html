@@ -24,12 +24,11 @@
 </head>
 <body>
 <script type="module">
-    // Importing module scripts
     import { get_default_lil_gui, ThreeEngine, refresh_displays } from "../js/utils/utils_three.js";
     import { mul_matrix_matrix } from "../js/utils/utils_math.js";
-    import { STLLoader } from 'https://unpkg.com/three@0.160.0/examples/jsm/loaders/STLLoader.js';
     import { genLeafMesh } from "../js/utils/leaf.js"
 
+    // data to generate a randomized tree
     const trees = [
             {
                 name: 'peach',
@@ -115,7 +114,6 @@
 
     const selectedTree = trees[Math.floor(Math.random() * trees.length)];
 
-    // Setup of ThreeEngine
     let engine = ThreeEngine.new_default_3d(30, 10, 30, false, selectedTree.name);
 
     // GUI and other setup
@@ -152,13 +150,13 @@
     //folder.add(params, 'branchTheta', 0, 20).name('branchTheta');
     //gui.add(operations, 'reset').name('Reset parameters');
 
+    // Generate tree branches
+
     var tree = new THREE.Tree(selectedTree.parameters);
-
     var treeGeometry = THREE.TreeGeometry.build(tree);
+
     var textureLoader = new THREE.TextureLoader();
-
     const barkPath = `../js/assets/bark_${selectedTree.name}.png`;
-
     textureLoader.load(barkPath, function(texture) {
         var treeMaterial = new THREE.MeshPhongMaterial({
             map: texture
@@ -168,11 +166,12 @@
         engine.scene.add(treeMesh);
     });
 
+    //Generate tree leaves
     genLeafMesh(tree, selectedTree.leafShape, selectedTree.leafType, selectedTree.leafScale, selectedTree.leafScaleX, engine);
 
     engine.animation_loop((delta) => {
-        
     });
+
 </script>
 </body>
 </html>

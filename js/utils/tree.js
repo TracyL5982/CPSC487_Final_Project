@@ -1,9 +1,11 @@
 /*
+ * TreeSpawner
  * params
  *  theta : the amount of randomization direction
  *  attenuation : the attenuation rate of length
- *  rootRange : the range of segments for branch' parent
+ *  rootRange : the range of segments for parent
  * */
+
 THREE.TreeSpawner = function(params) {
     params = params || {};
     this.theta = params.theta || Math.PI * 0.25; 
@@ -15,10 +17,6 @@ THREE.TreeSpawner.prototype = {
     spawn : function(branch, extension) {
         var theta = this.theta;
         var atten = this.attenuation;
-
-        var htheta = theta * 0.5;
-        // var x = Math.random() * theta - htheta;
-        // var z = Math.random() * theta - htheta;
 
         var x = randomAngle(-theta, theta);
         var z = randomAngle(-theta, theta);
@@ -54,6 +52,7 @@ THREE.TreeSpawner.prototype = {
 };
 
 /*
+ * TreeBranch
  * params
  *  from : THREE.Vector3 or TreeSegment
  *  rotation : THREE.Matrix4
@@ -61,6 +60,7 @@ THREE.TreeSpawner.prototype = {
  *  generation : branch' generation from root
  *  generations : the # of generations
  * */
+
 THREE.TreeBranch = function(params) {
     var from = params.from;
     this.rotation = params.rotation;
@@ -77,10 +77,9 @@ THREE.TreeBranch = function(params) {
 
     if(from instanceof THREE.TreeSegment) {
         this.from = from;
-        // this.position = from.position;
         this.position = from.position.clone().add(new THREE.Vector3(0, 1, 0).applyMatrix4(from.rotation).setLength(0.05));
     } else if(from instanceof THREE.Vector3) {
-        this.from = null; // root branch
+        this.from = null; 
         this.position = from;
     } else {
         console.warning("from argument is missing !");
@@ -97,6 +96,15 @@ function randomAngle(min, max) {
     return Math.random() * (max - min) + min;
 }
 
+/*
+ * TreeBranch
+ * params
+ *  from : THREE.Vector3 or TreeSegment
+ *  rotation : THREE.Matrix4
+ *  length : Number
+ *  generation : branch' generation from root
+ *  generations : the # of generations
+ * */
 
 THREE.TreeBranch.prototype = {
 
@@ -108,42 +116,23 @@ THREE.TreeBranch.prototype = {
         var x = Math.random() * theta - htheta;
         var z = Math.random() * theta - htheta;
 
-        // 0-0.25 PI - 0
-
-        // var theta = Math.PI * 0.5;  // This is Pi/2, but you can adjust or remove this if it's globally defined
-        // var htheta = theta * 0.5;   // Half theta, Pi/4
-
-        // // make branches straighter or curvier
-
-        // var x = randomAngle(-Math.PI * 0.125, Math.PI * 0.125);
-        // var z = randomAngle(-Math.PI * 0.125, Math.PI * 0.125);
-
-        // // var x = randomAngle(-Math.PI * 0.01, Math.PI * 0.01);
-        // // var z = randomAngle(-Math.PI * 0.01, Math.PI * 0.01);
-
         var rot = new THREE.Matrix4();
         var euler = new THREE.Euler(x, 0, z);
         rot.makeRotationFromEuler(euler);
         direction.applyMatrix4(rot);
         var controlPoint = this.position.clone().add(direction.setLength(this.length * 0.5));
-
         var curve = new THREE.CatmullRomCurve3([this.position, controlPoint, this.to]);
 
         var fromRatio = this.generation == 0 ? 1.0 : 1.0/2**this.generation;
-
-        //var fromRatio = this.generation == 0 ? 1.0 : 1.0 - this.generation / (this.generations + 1);
-        //var toRatio = 1.0 - (this.generation + 1) / (this.generations + 1);
         var toRatio = 0.5 * fromRatio;
-
         var fromRadius = radius * fromRatio;
         var toRadius = radius * toRatio;
 
         var rotation = this.rotation;
-
         var segments = [];
         var uvLength = this.uvLength;
         var uvOffset = this.uvOffset;
-        //what are points?
+    
         var points = curve.getPoints(heightSegments);
 
         if(this.from !== null) {
@@ -219,9 +208,11 @@ THREE.TreeBranch.prototype = {
 };
 
 /*
+ * TreeSegment
  * position : THREE.Vector3
  * rotation : THREE.Matrix4
  * */
+
 THREE.TreeSegment = function(position, rotation, uvOffset, radius, radiusSegments) {
     this.position = position;
     this.rotation = rotation;
@@ -248,6 +239,11 @@ THREE.TreeSegment.prototype = {
     }
     
 };
+
+/*
+ * Tree
+ * call TreeSpawner
+ * */
 
 THREE.Tree = function(params, spawner) {
     params = params || {};

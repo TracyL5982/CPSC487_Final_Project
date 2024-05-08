@@ -1,7 +1,3 @@
-/*
- * @author mattatz / http://mattatz.github.io/
- * */
-
 THREE.TreeHelper = function(system) {
     THREE.Object3D.call(this);
 
